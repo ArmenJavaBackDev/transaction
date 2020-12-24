@@ -1,0 +1,20 @@
+[
+  {
+    "firstName": "Dav",
+    "hashPassword": "$2a$10$mh6JTqBMNAb3pwk3nuCbTuvGZ9VTeu2upeWHWzENwds3um6sMe98a",
+    "id": 1,
+    "lastName": "Khachatryan",
+    "login": "david",
+    "role": "USER",
+    "state": "ACTIVE"
+  },
+  {
+    "id": 2,
+    "firstName": "Armen",
+    "lastName": "Abrahamyan",
+    "login": "armen",
+    "hashPassword": "$2a$10$V4t8IcZ96UKxLYbFtgcNT.sz/HDf1vsUh2Jdo3ypQpYDQWyH7Wwxe",
+    "role": "USER",
+    "state": "ACTIVE"
+  }
+]
