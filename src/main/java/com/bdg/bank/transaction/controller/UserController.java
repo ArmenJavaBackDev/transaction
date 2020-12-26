@@ -36,7 +36,7 @@ public class UserController {
         return userService.getTransactionHistory(id);
     }
 
-    @GetMapping("/{id}/transaction")
+    @GetMapping("/{id}/transaction/filter")
     public ResponseEntity<?> getFilteredTransactionHistory(@PathVariable Long id, @RequestParam LocalDate date) {
         return userService.getTransactionHistoryForSpecifiedDate(id, date);
     }
