@@ -9,6 +9,7 @@ import com.bdg.bank.transaction.entity.UserEntity;
 import com.bdg.bank.transaction.repository.AuthorityRepository;
 import com.bdg.bank.transaction.repository.TransactionRepository;
 import com.bdg.bank.transaction.repository.UserRepository;
+import com.bdg.bank.transaction.service.IUserService;
 import com.bdg.bank.transaction.util.TransactionConverter;
 import com.bdg.bank.transaction.util.UserConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class UserService {
+public class UserService implements IUserService {
 
     private UserRepository userRepository;
 

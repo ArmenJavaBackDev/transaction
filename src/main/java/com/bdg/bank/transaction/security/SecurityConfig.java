@@ -1,6 +1,7 @@
 package com.bdg.bank.transaction.security;
 
 import com.bdg.bank.transaction.entity.Roles;
+import com.bdg.bank.transaction.security.impl.BankUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

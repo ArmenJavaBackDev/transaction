@@ -1,4 +1,4 @@
-package com.bdg.bank.transaction.security;
+package com.bdg.bank.transaction.security.impl;
 
 import com.bdg.bank.transaction.entity.Authority;
 import com.bdg.bank.transaction.entity.Roles;

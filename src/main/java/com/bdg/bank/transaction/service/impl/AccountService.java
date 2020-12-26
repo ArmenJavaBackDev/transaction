@@ -5,6 +5,7 @@ import com.bdg.bank.transaction.entity.Account;
 import com.bdg.bank.transaction.entity.UserEntity;
 import com.bdg.bank.transaction.repository.AccountRepository;
 import com.bdg.bank.transaction.repository.UserRepository;
+import com.bdg.bank.transaction.service.IAccountService;
 import com.bdg.bank.transaction.util.AccountConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
-public class AccountService {
+public class AccountService implements IAccountService {
 
     private AccountRepository accountRepository;
 

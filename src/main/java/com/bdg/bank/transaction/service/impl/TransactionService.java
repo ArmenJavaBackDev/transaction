@@ -9,7 +9,8 @@ import com.bdg.bank.transaction.entity.UserEntity;
 import com.bdg.bank.transaction.repository.AccountRepository;
 import com.bdg.bank.transaction.repository.TransactionRepository;
 import com.bdg.bank.transaction.repository.UserRepository;
-import com.bdg.bank.transaction.security.AuthenticationFacade;
+import com.bdg.bank.transaction.security.impl.AuthenticationFacade;
+import com.bdg.bank.transaction.service.ITransactionService;
 import com.bdg.bank.transaction.util.TransactionConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class TransactionService {
+public class TransactionService implements ITransactionService {
 
     private AccountRepository accountRepository;
 
