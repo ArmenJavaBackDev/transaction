@@ -1,0 +1,5 @@
+users:
+  default:
+    name: admin
+    password: admin
+    role: ADMIN

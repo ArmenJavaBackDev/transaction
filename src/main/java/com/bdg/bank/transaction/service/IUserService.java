@@ -1,4 +1,4 @@
 package com.bdg.bank.transaction.service;
 
-public class BankAccountService {
+public interface IUserService {
 }
