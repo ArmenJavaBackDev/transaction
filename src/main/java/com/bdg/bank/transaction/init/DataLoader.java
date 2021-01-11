@@ -1,8 +1,8 @@
 package com.bdg.bank.transaction.init;
 
 import com.bdg.bank.transaction.config.DefaultUserProperties;
-import com.bdg.bank.transaction.entity.Roles;
 import com.bdg.bank.transaction.entity.Authority;
+import com.bdg.bank.transaction.entity.Roles;
 import com.bdg.bank.transaction.entity.UserEntity;
 import com.bdg.bank.transaction.repository.AuthorityRepository;
 import com.bdg.bank.transaction.repository.UserRepository;
@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.bdg.bank.transaction.entity.Roles.ADMIN;
@@ -47,20 +48,21 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
                     UserEntity.builder()
                             .username(defaultUserProperties.getUsername())
                             .password(passwordEncoder.encode(defaultUserProperties.getPassword()))
+                            .firstName(defaultUserProperties.getFirstName())
+                            .lastName(defaultUserProperties.getLastName())
                             .authority(authority)
                             .build()
             );
         }
-
     }
 
     @Transactional
     Authority createAuthorityIfNotFound(Roles role) {
-        Optional<Authority> optionalAuthority = authorityRepository.findByRole(role);
-        if (optionalAuthority.isEmpty()) {
-            Authority authority = Authority.builder().role(role).build();
+        Authority authority = authorityRepository.findByRole(role);
+        if (Objects.isNull(authority)) {
+            authority = Authority.builder().role(role).build();
             return authorityRepository.save(authority);
         }
-        return optionalAuthority.get();
+        return authority;
     }
 }

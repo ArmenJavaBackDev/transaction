@@ -1,5 +1,7 @@
 users:
   default:
-    name: admin
+    username: admin
     password: admin
+    firstName: Armen
+    lastName: Abrahamyan
     role: ADMIN

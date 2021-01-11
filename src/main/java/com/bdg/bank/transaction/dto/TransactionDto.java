@@ -1,4 +1,4 @@
-package com.bdg.bank.transaction.domain;
+package com.bdg.bank.transaction.dto;
 
 import com.bdg.bank.transaction.entity.TransactionOperation;
 import lombok.AllArgsConstructor;
@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
@@ -14,7 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TransactionDetails {
+public class TransactionDto implements Serializable {
     private Long id;
     private Long user_id;
     private String accountNumber;
