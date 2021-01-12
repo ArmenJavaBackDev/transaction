@@ -1,19 +1,22 @@
 package com.bdg.bank.transaction.service;
 
+import com.bdg.bank.transaction.dto.TransactionDto;
 import com.bdg.bank.transaction.dto.UserDto;
-import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 public interface IUserService {
-    ResponseEntity<?> registerUser(UserDto userDto);
+    UserDto registerUser(UserDto userDto);
 
-    ResponseEntity<?> changeUserRole(Long id);
+    void changeUserRole(Long id);
 
-    ResponseEntity<?> getTransactionHistory(Long userId);
+    Set<TransactionDto> getTransactionHistory(Long userId);
 
-    ResponseEntity<?> getTransactionHistoryForSpecifiedDate(Long userId, LocalDate date);
+    Set<TransactionDto> getTransactionHistoryForSpecifiedDate(Long userId, LocalDate date);
 
     List<UserDto> findAllUsers();
+
+    boolean isUserExist(String userName);
 }

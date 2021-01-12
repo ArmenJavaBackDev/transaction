@@ -13,7 +13,6 @@ import com.bdg.bank.transaction.service.IUserService;
 import com.bdg.bank.transaction.util.ModelMapperHelper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,46 +34,34 @@ public class UserService implements IUserService {
     private final ModelMapperHelper modelMapperHelper;
 
     @Transactional
-    public ResponseEntity<?> registerUser(UserDto userDto) {
-        Optional<UserEntity> existingUser = userRepository.findByUsername(userDto.getUsername());
-        if (existingUser.isPresent()) {
-            return ResponseEntity.badRequest().body(String.format("User with username '%s' already exist", userDto.getUsername()));
-        }
+    public UserDto registerUser(UserDto userDto) {
         Authority authority = authorityRepository.findByRole(Roles.USER);
         UserEntity user = modelMapper.map(userDto, UserEntity.class);
         user.setAuthorities(Set.of(authority));
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userRepository.save(user);
-        UserDto createdUser = modelMapper.map(user, UserDto.class);
-        return ResponseEntity.ok(createdUser.getId());
+        return modelMapper.map(user, UserDto.class);
     }
 
     @Transactional
-    public ResponseEntity<?> changeUserRole(Long id) {
+    public void changeUserRole(Long id) {
         Optional<UserEntity> existingUser = userRepository.findById(id);
-        if (existingUser.isPresent()) {
-            UserEntity user = existingUser.get();
-            UserDto updatedUser = updateAuthorities(user);
-            return ResponseEntity.ok(updatedUser);
-        }
-        return ResponseEntity.notFound().build();
+        existingUser.ifPresent(this::updateAuthorities);
     }
 
-    public ResponseEntity<?> getTransactionHistory(Long userId) {
+    public Set<TransactionDto> getTransactionHistory(Long userId) {
         UserEntity currentUser = userRepository.getOne(userId);
         Set<Transaction> transactions = currentUser.getTransactions();
-        Set<TransactionDto> transactionDetails = modelMapperHelper.mapSet(transactions, TransactionDto.class);
-        return ResponseEntity.ok(transactionDetails);
+        return modelMapperHelper.mapSet(transactions, TransactionDto.class);
     }
 
-    public ResponseEntity<?> getTransactionHistoryForSpecifiedDate(Long userId, LocalDate date) {
+    public Set<TransactionDto> getTransactionHistoryForSpecifiedDate(Long userId, LocalDate date) {
         UserEntity currentUser = userRepository.getOne(userId);
         Set<Transaction> transactions = transactionRepository.findByOwnerAndDate(currentUser, date);
-        Set<TransactionDto> transactionDetails = modelMapperHelper.mapSet(transactions, TransactionDto.class);
-        return ResponseEntity.ok(transactionDetails);
+        return modelMapperHelper.mapSet(transactions, TransactionDto.class);
     }
 
-    private UserDto updateAuthorities(UserEntity userEntity) {
+    private void updateAuthorities(UserEntity userEntity) {
         Authority admin = authorityRepository.findByRole(Roles.ADMIN);
         Authority user = authorityRepository.findByRole(Roles.USER);
         userEntity.getAuthorities().remove(user);
@@ -84,12 +71,16 @@ public class UserService implements IUserService {
         userRepository.save(userEntity);
         authorityRepository.save(user);
         authorityRepository.save(admin);
-        return modelMapper.map(userEntity, UserDto.class);
     }
 
     @Override
     public List<UserDto> findAllUsers() {
         List<UserEntity> allUsers = userRepository.findAll();
         return modelMapperHelper.mapList(allUsers, UserDto.class);
+    }
+
+    public boolean isUserExist(String userName) {
+        Optional<UserEntity> user = userRepository.findByUsername(userName);
+        return user.isPresent();
     }
 }

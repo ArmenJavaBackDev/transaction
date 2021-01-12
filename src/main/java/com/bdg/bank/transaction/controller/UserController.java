@@ -1,9 +1,11 @@
 package com.bdg.bank.transaction.controller;
 
+import com.bdg.bank.transaction.dto.TransactionDto;
 import com.bdg.bank.transaction.dto.UserDto;
 import com.bdg.bank.transaction.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
@@ -25,29 +29,33 @@ public class UserController {
     private final IUserService userService;
 
     @GetMapping
-    public ResponseEntity<?> getUsers() {
+    public ResponseEntity<List<UserDto>> getUsers() {
         List<UserDto> allUsers = userService.findAllUsers();
         return ResponseEntity.ok(allUsers);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDto userDto) {
-        return userService.registerUser(userDto);
+    public ResponseEntity<UserDto> register(@Valid @RequestBody UserDto userDto) {
+        if (userService.isUserExist(userDto.getUsername())) {
+            ResponseEntity.badRequest().body("User already exist");
+        }
+        return ResponseEntity.ok(userService.registerUser(userDto));
     }
 
     @PutMapping("/{id}/role")
-    public ResponseEntity<?> changeUserRole(@PathVariable Long id) {
-        return userService.changeUserRole(id);
+    public ResponseEntity<Void> changeUserRole(@PathVariable Long id) {
+        userService.changeUserRole(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{id}/transaction")
-    public ResponseEntity<?> getTransactionHistory(@PathVariable Long id) {
-        return userService.getTransactionHistory(id);
+    public ResponseEntity<Set<TransactionDto>> getTransactionHistory(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getTransactionHistory(id));
     }
 
     @GetMapping("/{id}/transaction/filter")
-    public ResponseEntity<?> getFilteredTransactionHistory(@PathVariable Long id,
-                                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return userService.getTransactionHistoryForSpecifiedDate(id, date);
+    public ResponseEntity<Set<TransactionDto>> getFilteredTransactionHistory(@PathVariable Long id,
+                                                                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(userService.getTransactionHistoryForSpecifiedDate(id, date));
     }
 }
