@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import javax.transaction.Transactional;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.bdg.bank.transaction.entity.Roles.ADMIN;
 
@@ -44,15 +45,13 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         Optional<UserEntity> optionalUserEntity = userRepository.findByUsername(defaultUserProperties.getUsername());
         if (optionalUserEntity.isEmpty()) {
             Authority authority = authorityRepository.getAuthorityByRole(Roles.valueOf(defaultUserProperties.getRole()));
-            userRepository.save(
-                    UserEntity.builder()
-                            .username(defaultUserProperties.getUsername())
-                            .password(passwordEncoder.encode(defaultUserProperties.getPassword()))
-                            .firstName(defaultUserProperties.getFirstName())
-                            .lastName(defaultUserProperties.getLastName())
-                            .authority(authority)
-                            .build()
-            );
+            UserEntity userEntity = new UserEntity();
+            userEntity.setUsername(defaultUserProperties.getUsername());
+            userEntity.setPassword(passwordEncoder.encode(defaultUserProperties.getPassword()));
+            userEntity.setFirstName(defaultUserProperties.getFirstName());
+            userEntity.setLastName(defaultUserProperties.getLastName());
+            userEntity.setAuthorities(Set.of(authority));
+            userRepository.save(userEntity);
         }
     }
 
@@ -60,7 +59,8 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     Authority createAuthorityIfNotFound(Roles role) {
         Authority authority = authorityRepository.findByRole(role);
         if (Objects.isNull(authority)) {
-            authority = Authority.builder().role(role).build();
+            authority = new Authority();
+            authority.setRole(role);
             return authorityRepository.save(authority);
         }
         return authority;

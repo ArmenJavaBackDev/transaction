@@ -1,7 +1,6 @@
 package com.bdg.bank.transaction.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +23,6 @@ import java.util.Set;
 @Table(name = "users")
 @Setter
 @Getter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserEntity {
@@ -50,15 +48,11 @@ public class UserEntity {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private Set<Transaction> transactions;
 
-    @Builder.Default
     private Boolean accountNonExpired = true;
 
-    @Builder.Default
     private Boolean accountNonLocked = true;
 
-    @Builder.Default
     private Boolean credentialsNonExpired = true;
 
-    @Builder.Default
     private Boolean enabled = true;
 }

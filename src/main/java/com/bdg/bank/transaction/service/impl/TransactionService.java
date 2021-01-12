@@ -11,6 +11,7 @@ import com.bdg.bank.transaction.repository.TransactionRepository;
 import com.bdg.bank.transaction.repository.UserRepository;
 import com.bdg.bank.transaction.security.impl.AuthenticationFacade;
 import com.bdg.bank.transaction.service.ITransactionService;
+import com.bdg.bank.transaction.util.ModelMapperHelper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +31,13 @@ public class TransactionService implements ITransactionService {
     private final AuthenticationFacade authenticationFacade;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final ModelMapperHelper modelMapperHelper;
 
     public ResponseEntity<List<TransactionDto>> findTransactionsWithPendingStatus(Long userId, LocalDate date) {
         UserEntity owner = userRepository.getOne(userId);
         Optional<List<Transaction>> optionalTransactionList = transactionRepository.findByOwnerAndDateAndStatus(owner, date, Status.PENDING);
         return optionalTransactionList
-                .map(transactions -> ResponseEntity.ok(mapList(transactions, TransactionDto.class)))
+                .map(transactions -> ResponseEntity.ok(modelMapperHelper.mapList(transactions, TransactionDto.class)))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
@@ -44,16 +45,17 @@ public class TransactionService implements ITransactionService {
     public ResponseEntity<?> createTransaction(TransactionDto transactionDto) {
         Transaction transaction = modelMapper.map(transactionDto, Transaction.class);
         Optional<UserEntity> optionalUser = userRepository.findByUsername(authenticationFacade.getAuthentication().getName());
-        if (optionalUser.isPresent()) {
+        if (optionalUser.isPresent() && isAccountExist(transaction.getAccountNumber())) {
             transaction.setOwner(optionalUser.get());
+            transaction.setDate(LocalDate.now());
             transaction.setStatus(Status.PENDING);
             transactionRepository.save(transaction);
             TransactionDto savedTransactionDto = modelMapper.map(transaction, TransactionDto.class);
             return ResponseEntity.ok(savedTransactionDto);
         }
         return ResponseEntity.badRequest().body(transactionDto);
-
     }
+
     @Transactional
     public ResponseEntity<TransactionDto> acceptTransaction(Long id) {
         Optional<Transaction> optionalTransaction = transactionRepository.findById(id);
@@ -98,10 +100,9 @@ public class TransactionService implements ITransactionService {
         account.setBalance(account.getBalance() - transaction.getAmount());
     }
 
-    <S, T> List<T> mapList(List<S> source, Class<T> targetClass) {
-        return source
-                .stream()
-                .map(element -> modelMapper.map(element, targetClass))
-                .collect(Collectors.toList());
+    private boolean isAccountExist(String accountNumber) {
+        Optional<Account> account = accountRepository.findByAccountNumber(accountNumber);
+        return account.isPresent();
     }
+
 }

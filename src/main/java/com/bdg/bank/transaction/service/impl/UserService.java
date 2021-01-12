@@ -10,8 +10,7 @@ import com.bdg.bank.transaction.repository.AuthorityRepository;
 import com.bdg.bank.transaction.repository.TransactionRepository;
 import com.bdg.bank.transaction.repository.UserRepository;
 import com.bdg.bank.transaction.service.IUserService;
-import com.bdg.bank.transaction.util.TransactionConverter;
-import com.bdg.bank.transaction.util.UserConverter;
+import com.bdg.bank.transaction.util.ModelMapperHelper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +32,7 @@ public class UserService implements IUserService {
     private final TransactionRepository transactionRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final ModelMapperHelper modelMapperHelper;
 
     @Transactional
     public ResponseEntity<?> registerUser(UserDto userDto) {
@@ -63,14 +63,14 @@ public class UserService implements IUserService {
     public ResponseEntity<?> getTransactionHistory(Long userId) {
         UserEntity currentUser = userRepository.getOne(userId);
         Set<Transaction> transactions = currentUser.getTransactions();
-        Set<TransactionDto> transactionDetails = TransactionConverter.convertToTransactionDetailsSet(transactions);
+        Set<TransactionDto> transactionDetails = modelMapperHelper.mapSet(transactions, TransactionDto.class);
         return ResponseEntity.ok(transactionDetails);
     }
 
     public ResponseEntity<?> getTransactionHistoryForSpecifiedDate(Long userId, LocalDate date) {
         UserEntity currentUser = userRepository.getOne(userId);
         Set<Transaction> transactions = transactionRepository.findByOwnerAndDate(currentUser, date);
-        Set<TransactionDto> transactionDetails = TransactionConverter.convertToTransactionDetailsSet(transactions);
+        Set<TransactionDto> transactionDetails = modelMapperHelper.mapSet(transactions, TransactionDto.class);
         return ResponseEntity.ok(transactionDetails);
     }
 
@@ -90,6 +90,6 @@ public class UserService implements IUserService {
     @Override
     public List<UserDto> findAllUsers() {
         List<UserEntity> allUsers = userRepository.findAll();
-        return UserConverter.convertToUserList(allUsers);
+        return modelMapperHelper.mapList(allUsers, UserDto.class);
     }
 }
